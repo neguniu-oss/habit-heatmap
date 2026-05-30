@@ -383,7 +383,7 @@
 
     .habit-item {
       display: grid;
-      grid-template-columns: 16px minmax(0, 1fr) auto;
+      grid-template-columns: 16px minmax(0, 1fr) auto auto;
       gap: 10px;
       align-items: center;
       min-height: 42px;
@@ -400,15 +400,27 @@
       font-weight: 700;
     }
 
+    .rename-btn,
     .delete-btn {
       border: 0;
       background: transparent;
-      color: #9a2f43;
       cursor: pointer;
       font-size: 18px;
       width: 30px;
       height: 30px;
       border-radius: 6px;
+    }
+
+    .rename-btn {
+      color: #174ea6;
+    }
+
+    .delete-btn {
+      color: #9a2f43;
+    }
+
+    .rename-btn:hover {
+      background: rgba(36, 107, 254, 0.10);
     }
 
     .delete-btn:hover {
@@ -807,9 +819,11 @@
         item.innerHTML = `
           <span class="habit-dot" style="background:${habit.color}"></span>
           <span class="habit-name">${habit.name}</span>
+          <button class="rename-btn" title="重命名 ${habit.name}" aria-label="重命名 ${habit.name}">✎</button>
           <button class="delete-btn" title="删除 ${habit.name}" aria-label="删除 ${habit.name}">×</button>
         `;
-        item.querySelector("button").addEventListener("click", () => deleteHabit(habit.id));
+        item.querySelector(".rename-btn").addEventListener("click", () => renameHabit(habit.id));
+        item.querySelector(".delete-btn").addEventListener("click", () => deleteHabit(habit.id));
         els.habitList.appendChild(item);
       });
     }
@@ -826,6 +840,18 @@
       renderHeatmap();
       renderEntryPanel();
       renderHabitList();
+    }
+
+    function renameHabit(habitId) {
+      const habit = state.habits.find((item) => item.id === habitId);
+      if (!habit) return;
+      const nextName = prompt("输入新的项目名称", habit.name);
+      if (nextName === null) return;
+      const cleanName = nextName.trim();
+      if (!cleanName) return;
+      habit.name = cleanName;
+      saveState();
+      render();
     }
 
     function deleteHabit(habitId) {
