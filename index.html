@@ -1,16 +1,17 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#246bfe" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-title" content="习惯热力图" />
+  <meta name="apple-mobile-web-app-title" content="Habit Heatmap" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <title>月度习惯热力图</title>
+  <title>Monthly Habit Heatmap</title>
   <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./icon-192.png" sizes="192x192" type="image/png" />
   <link rel="icon" href="./icon.svg" type="image/svg+xml" />
-  <link rel="apple-touch-icon" href="./icon.svg" />
+  <link rel="apple-touch-icon" href="./icon-180.png" />
   <style>
     :root {
       color-scheme: light;
@@ -24,7 +25,7 @@
       --dance: #b84a62;
       --accent: #246bfe;
       --shadow: 0 18px 45px rgba(32, 33, 36, 0.11);
-      font-family: "Microsoft YaHei", "PingFang SC", system-ui, -apple-system, sans-serif;
+      font-family: Inter, Roboto, "Segoe UI", system-ui, -apple-system, sans-serif;
     }
 
     * {
@@ -515,47 +516,47 @@
   <main class="shell">
     <header class="topbar">
       <div>
-        <h1>月度习惯热力图</h1>
-        <p class="subtitle">记录每一天的咖啡、健身、跳舞次数。颜色越深，代表这个月里那一天做得越多。</p>
+        <h1>Monthly Habit Heatmap</h1>
+        <p class="subtitle">Track daily counts for coffee, workouts, dancing, or anything else. Darker days mean higher activity.</p>
       </div>
     </header>
 
     <section class="install-strip" id="installStrip">
-      <span id="installText">可以安装到手机桌面，之后像 App 一样打开。</span>
-      <button class="primary-btn" id="installBtn">安装</button>
+      <span id="installText">Install this on your phone and open it like an app.</span>
+      <button class="primary-btn" id="installBtn">Install</button>
     </section>
 
-    <section class="controls panel" aria-label="筛选和录入">
+    <section class="controls panel" aria-label="Filters and entry">
       <div class="field">
-        <label for="habitSelect">项目</label>
+        <label for="habitSelect">Habit</label>
         <select id="habitSelect"></select>
       </div>
       <div class="field">
-        <label for="monthPicker">月份</label>
+        <label for="monthPicker">Month</label>
         <div class="month-actions">
-          <button class="icon-btn" id="prevMonth" title="上个月" aria-label="上个月">‹</button>
+          <button class="icon-btn" id="prevMonth" title="Previous month" aria-label="Previous month">‹</button>
           <input id="monthPicker" type="month" />
-          <button class="icon-btn" id="nextMonth" title="下个月" aria-label="下个月">›</button>
-          <button class="ghost-btn" id="todayBtn">回到本月</button>
+          <button class="icon-btn" id="nextMonth" title="Next month" aria-label="Next month">›</button>
+          <button class="ghost-btn" id="todayBtn">This month</button>
         </div>
       </div>
       <div class="field">
         <label>&nbsp;</label>
-        <button class="ghost-btn" id="exportBtn">导出数据</button>
+        <button class="ghost-btn" id="exportBtn">Export data</button>
       </div>
     </section>
 
     <section class="grid-layout">
-      <section class="heatmap-panel panel" aria-label="热力图">
+      <section class="heatmap-panel panel" aria-label="Heatmap">
         <div class="heatmap-head">
           <div class="heatmap-title">
             <span class="habit-dot" id="titleDot"></span>
-            <h2 id="heatmapTitle">热力图</h2>
+            <h2 id="heatmapTitle">Heatmap</h2>
           </div>
           <div class="stats">
-            <span class="stat-pill" id="totalStat">总计 0 次</span>
-            <span class="stat-pill" id="bestStat">最高 0 次</span>
-            <span class="stat-pill" id="activeStat">记录 0 天</span>
+            <span class="stat-pill" id="totalStat">Total 0</span>
+            <span class="stat-pill" id="bestStat">Best 0</span>
+            <span class="stat-pill" id="activeStat">Active 0 days</span>
           </div>
         </div>
         <div class="weekdays" id="weekdays"></div>
@@ -564,32 +565,32 @@
       </section>
 
       <aside class="side">
-        <section class="card panel" aria-label="当天记录">
-          <h3>当天次数</h3>
+        <section class="card panel" aria-label="Daily entry">
+          <h3>Daily Count</h3>
           <div class="entry-summary">
             <div>
-              <div class="selected-date" id="selectedDate">1日</div>
-              <div class="entry-count" id="entryLabel">当前 0 次</div>
+              <div class="selected-date" id="selectedDate">Day 1</div>
+              <div class="entry-count" id="entryLabel">Current 0</div>
             </div>
           </div>
           <div class="stepper">
-            <button class="icon-btn" id="minusBtn" title="减少" aria-label="减少">−</button>
+            <button class="icon-btn" id="minusBtn" title="Decrease" aria-label="Decrease">−</button>
             <input id="countInput" type="number" min="0" step="1" value="0" />
-            <button class="icon-btn" id="plusBtn" title="增加" aria-label="增加">+</button>
+            <button class="icon-btn" id="plusBtn" title="Increase" aria-label="Increase">+</button>
           </div>
           <div class="entry-actions">
-            <button class="primary-btn" id="saveBtn">保存</button>
-            <button class="ghost-btn" id="clearBtn">清零</button>
+            <button class="primary-btn" id="saveBtn">Save</button>
+            <button class="ghost-btn" id="clearBtn">Clear</button>
           </div>
         </section>
 
-        <section class="card panel" aria-label="项目管理">
-          <h3>项目管理</h3>
+        <section class="card panel" aria-label="Habit manager">
+          <h3>Habit Manager</h3>
           <div class="habit-list" id="habitList"></div>
           <div class="add-habit">
-            <input id="newHabitName" placeholder="新增项目，比如 阅读" />
-            <input id="newHabitColor" type="color" value="#246bfe" title="颜色" aria-label="颜色" />
-            <button class="primary-btn" id="addHabitBtn">添加</button>
+            <input id="newHabitName" placeholder="New habit, e.g. Reading" />
+            <input id="newHabitColor" type="color" value="#246bfe" title="Color" aria-label="Color" />
+            <button class="primary-btn" id="addHabitBtn">Add</button>
           </div>
         </section>
       </aside>
@@ -598,12 +599,12 @@
 
   <script>
     const STORAGE_KEY = "monthly-heatmap-tracker-v1";
-    const weekdays = ["一", "二", "三", "四", "五", "六", "日"];
+    const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
     const defaultState = {
       habits: [
-        { id: "coffee", name: "喝咖啡", color: "#8b5e34" },
-        { id: "fitness", name: "健身", color: "#1e8a6a" },
-        { id: "dance", name: "跳舞", color: "#b84a62" }
+        { id: "coffee", name: "Coffee", color: "#8b5e34" },
+        { id: "fitness", name: "Fitness", color: "#1e8a6a" },
+        { id: "dance", name: "Dancing", color: "#b84a62" }
       ],
       entries: {},
       selectedHabitId: "coffee",
@@ -653,10 +654,30 @@
       try {
         const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
         if (!saved || !Array.isArray(saved.habits) || !saved.habits.length) return structuredClone(defaultState);
-        return { ...structuredClone(defaultState), ...saved };
+        return migrateState({ ...structuredClone(defaultState), ...saved });
       } catch {
         return structuredClone(defaultState);
       }
+    }
+
+    function migrateState(nextState) {
+      const englishDefaults = {
+        coffee: "Coffee",
+        fitness: "Fitness",
+        dance: "Dancing"
+      };
+      const oldDefaultNames = {
+        coffee: "\u559d\u5496\u5561",
+        fitness: "\u5065\u8eab",
+        dance: "\u8df3\u821e"
+      };
+      nextState.habits = nextState.habits.map((habit) => {
+        if (oldDefaultNames[habit.id] && habit.name === oldDefaultNames[habit.id]) {
+          return { ...habit, name: englishDefaults[habit.id] };
+        }
+        return habit;
+      });
+      return nextState;
     }
 
     function saveState() {
@@ -769,9 +790,9 @@
       document.documentElement.style.setProperty("--habit-color", habit.color);
       els.titleDot.style.background = habit.color;
       els.heatmapTitle.textContent = `${habit.name} · ${state.selectedMonth}`;
-      els.totalStat.textContent = `总计 ${total} 次`;
-      els.bestStat.textContent = `最高 ${best} 次`;
-      els.activeStat.textContent = `记录 ${activeDays} 天`;
+      els.totalStat.textContent = `Total ${total}`;
+      els.bestStat.textContent = `Best ${best}`;
+      els.activeStat.textContent = `Active ${activeDays} ${activeDays === 1 ? "day" : "days"}`;
 
       els.days.innerHTML = "";
       for (let i = 0; i < offset; i += 1) {
@@ -788,7 +809,7 @@
         day.className = `day${dayNumber === state.selectedDay ? " selected" : ""}`;
         day.style.setProperty("--heat-color", count === 0 ? "#ffffff" : mixColor(habit.color, strength));
         day.style.setProperty("--day-text", textColorFor(habit.color, strength));
-        day.innerHTML = `<span class="date">${dayNumber}</span><span class="count">${count} 次</span>`;
+        day.innerHTML = `<span class="date">${dayNumber}</span><span class="count">${count}</span>`;
         day.addEventListener("click", () => {
           state.selectedDay = dayNumber;
           saveState();
@@ -798,16 +819,16 @@
       });
 
       const levels = [0, 0.24, 0.46, 0.68, 0.9];
-      els.legend.innerHTML = `<span>少</span>${levels.map((level) => {
+      els.legend.innerHTML = `<span>Less</span>${levels.map((level) => {
         const color = level === 0 ? "#ffffff" : mixColor(habit.color, level);
         return `<span class="legend-swatch" style="background:${color}"></span>`;
-      }).join("")}<span>多</span>`;
+      }).join("")}<span>More</span>`;
     }
 
     function renderEntryPanel() {
       const count = getCount();
-      els.selectedDate.textContent = `${state.selectedDay}日`;
-      els.entryLabel.textContent = `当前 ${count} 次`;
+      els.selectedDate.textContent = `Day ${state.selectedDay}`;
+      els.entryLabel.textContent = `Current ${count}`;
       els.countInput.value = count;
     }
 
@@ -819,8 +840,8 @@
         item.innerHTML = `
           <span class="habit-dot" style="background:${habit.color}"></span>
           <span class="habit-name">${habit.name}</span>
-          <button class="rename-btn" title="重命名 ${habit.name}" aria-label="重命名 ${habit.name}">✎</button>
-          <button class="delete-btn" title="删除 ${habit.name}" aria-label="删除 ${habit.name}">×</button>
+          <button class="rename-btn" title="Rename ${habit.name}" aria-label="Rename ${habit.name}">✎</button>
+          <button class="delete-btn" title="Delete ${habit.name}" aria-label="Delete ${habit.name}">×</button>
         `;
         item.querySelector(".rename-btn").addEventListener("click", () => renameHabit(habit.id));
         item.querySelector(".delete-btn").addEventListener("click", () => deleteHabit(habit.id));
@@ -845,7 +866,7 @@
     function renameHabit(habitId) {
       const habit = state.habits.find((item) => item.id === habitId);
       if (!habit) return;
-      const nextName = prompt("输入新的项目名称", habit.name);
+      const nextName = prompt("Enter a new habit name", habit.name);
       if (nextName === null) return;
       const cleanName = nextName.trim();
       if (!cleanName) return;
@@ -856,11 +877,11 @@
 
     function deleteHabit(habitId) {
       if (state.habits.length <= 1) {
-        alert("至少保留一个项目。");
+        alert("Keep at least one habit.");
         return;
       }
       const habit = state.habits.find((item) => item.id === habitId);
-      if (!confirm(`删除「${habit.name}」及它的记录？`)) return;
+      if (!confirm(`Delete "${habit.name}" and all of its records?`)) return;
       state.habits = state.habits.filter((item) => item.id !== habitId);
       Object.keys(state.entries).forEach((key) => {
         if (key.startsWith(`${habitId}:`)) delete state.entries[key];
@@ -950,6 +971,8 @@
 
     let deferredInstallPrompt = null;
     const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const isIos = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
     window.addEventListener("beforeinstallprompt", (event) => {
       event.preventDefault();
@@ -961,7 +984,9 @@
 
     els.installBtn.addEventListener("click", async () => {
       if (!deferredInstallPrompt) {
-        els.installText.textContent = "在手机浏览器菜单里选择“添加到主屏幕”。";
+        els.installText.textContent = isIos
+          ? "In Safari, tap Share, then choose Add to Home Screen."
+          : "On your Honor phone, open the browser menu and choose Install app or Add to home screen.";
         els.installBtn.style.display = "none";
         els.installStrip.classList.add("visible");
         return;
@@ -977,6 +1002,16 @@
         navigator.serviceWorker.register("./sw.js");
       });
     }
+
+    window.addEventListener("load", () => {
+      if (isMobile && !isStandalone && !deferredInstallPrompt) {
+        els.installText.textContent = isIos
+          ? "On iPhone, tap Safari Share, then Add to Home Screen."
+          : "On your Honor phone, use Chrome or Honor Browser: menu, then Install app or Add to home screen.";
+        els.installBtn.textContent = "How to install";
+        els.installStrip.classList.add("visible");
+      }
+    });
 
     render();
   </script>

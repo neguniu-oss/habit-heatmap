@@ -1,15 +1,17 @@
-这是“月度习惯热力图”的手机可安装版。
+Monthly Habit Heatmap - mobile installable version
 
-使用方式：
-1. 把这个文件夹里的所有文件放到一个免费的静态网页托管服务。
-2. 用手机浏览器打开网页地址。
-3. 安卓 Chrome 通常会出现“安装”提示；iPhone Safari 可以点分享按钮，再选“添加到主屏幕”。
+How to use it on an Honor Android phone:
+1. Upload every file in this folder to a free static hosting service.
+2. Open the published HTTPS link on your Honor phone.
+3. Use Chrome or Honor Browser.
+4. Open the browser menu and choose "Install app" or "Add to home screen".
 
-推荐免费托管：
+Recommended free hosting:
 - GitHub Pages
 - Netlify
 - Cloudflare Pages
 
-注意：
-- 直接双击 index.html 可以预览和记录，但“安装到手机桌面”和离线缓存通常需要通过 https 网页地址打开。
-- 记录数据保存在手机本机浏览器里，不需要服务器。
+Important notes:
+- Do not open it as a local file on your phone. The install feature usually needs an HTTPS website link.
+- Your habit records are saved locally in the phone browser. No server or database is required.
+- If the icon or text does not update after uploading, open the link with ?v=4 at the end, then add it to the home screen again.
