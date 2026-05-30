@@ -1,0 +1,19 @@
+{
+  "name": "月度习惯热力图",
+  "short_name": "习惯热力图",
+  "description": "用热力图记录喝咖啡、健身、跳舞等每月次数。",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f7f4ef",
+  "theme_color": "#246bfe",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

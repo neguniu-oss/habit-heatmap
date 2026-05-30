@@ -1,0 +1,958 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#246bfe" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="习惯热力图" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <title>月度习惯热力图</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="./icon.svg" />
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f4ef;
+      --surface: #fffdf9;
+      --text: #202124;
+      --muted: #6b6f76;
+      --line: #ded8cf;
+      --coffee: #8b5e34;
+      --fitness: #1e8a6a;
+      --dance: #b84a62;
+      --accent: #246bfe;
+      --shadow: 0 18px 45px rgba(32, 33, 36, 0.11);
+      font-family: "Microsoft YaHei", "PingFang SC", system-ui, -apple-system, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100svh;
+      background:
+        linear-gradient(135deg, rgba(36, 107, 254, 0.10), transparent 34%),
+        linear-gradient(220deg, rgba(184, 74, 98, 0.10), transparent 36%),
+        var(--bg);
+      color: var(--text);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    .shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: max(18px, env(safe-area-inset-top)) 0 max(34px, env(safe-area-inset-bottom));
+    }
+
+    .topbar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 10px 0 0;
+      color: var(--muted);
+      max-width: 620px;
+      line-height: 1.6;
+    }
+
+    .panel {
+      background: rgba(255, 253, 249, 0.92);
+      border: 1px solid rgba(222, 216, 207, 0.88);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: minmax(230px, 1fr) minmax(260px, 1.1fr) auto;
+      gap: 12px;
+      padding: 14px;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    label {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    select,
+    input {
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--text);
+      padding: 0 12px;
+      outline: none;
+    }
+
+    select:focus,
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(36, 107, 254, 0.15);
+    }
+
+    .month-actions,
+    .entry-actions,
+    .habit-actions {
+      display: flex;
+      align-items: end;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .icon-btn,
+    .primary-btn,
+    .ghost-btn {
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--text);
+      cursor: pointer;
+      transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .icon-btn {
+      width: 42px;
+      padding: 0;
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .primary-btn,
+    .ghost-btn {
+      padding: 0 14px;
+      white-space: nowrap;
+    }
+
+    .primary-btn {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .ghost-btn:hover,
+    .icon-btn:hover {
+      transform: translateY(-1px);
+      border-color: #b8b2aa;
+      background: #faf7f1;
+    }
+
+    .primary-btn:hover {
+      transform: translateY(-1px);
+      background: #1858df;
+    }
+
+    .grid-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 330px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .heatmap-panel {
+      padding: 16px;
+      overflow: hidden;
+    }
+
+    .heatmap-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .heatmap-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .habit-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--habit-color);
+      flex: 0 0 auto;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.2;
+    }
+
+    .stats {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .stat-pill {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 7px 10px;
+      background: rgba(255, 255, 255, 0.68);
+    }
+
+    .weekdays,
+    .days {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .weekdays {
+      margin: 10px 0 8px;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .day {
+      aspect-ratio: 1 / 0.88;
+      min-height: 70px;
+      border: 1px solid rgba(222, 216, 207, 0.86);
+      border-radius: 8px;
+      padding: 8px;
+      background: var(--heat-color);
+      display: grid;
+      align-content: space-between;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+      color: var(--day-text, #202124);
+    }
+
+    .day:hover,
+    .day.selected {
+      transform: translateY(-2px);
+      border-color: var(--habit-color);
+      box-shadow: 0 10px 22px rgba(32, 33, 36, 0.13);
+    }
+
+    .day.blank {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .date {
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .count {
+      font-size: 13px;
+      justify-self: end;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.62);
+      color: inherit;
+    }
+
+    .legend {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 7px;
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .legend-swatch {
+      width: 22px;
+      height: 14px;
+      border-radius: 4px;
+      border: 1px solid rgba(32, 33, 36, 0.08);
+    }
+
+    .side {
+      display: grid;
+      gap: 14px;
+    }
+
+    .card {
+      padding: 15px;
+    }
+
+    .card h3 {
+      margin: 0 0 12px;
+      font-size: 18px;
+    }
+
+    .entry-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .selected-date {
+      font-size: 28px;
+      font-weight: 800;
+    }
+
+    .entry-count {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .stepper {
+      display: grid;
+      grid-template-columns: 46px minmax(70px, 1fr) 46px;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .stepper input {
+      text-align: center;
+      font-size: 22px;
+      font-weight: 800;
+      height: 54px;
+    }
+
+    .stepper .icon-btn {
+      width: 46px;
+      height: 54px;
+      font-size: 24px;
+    }
+
+    .entry-actions {
+      margin-top: 12px;
+    }
+
+    .install-strip {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 14px;
+      padding: 10px 12px;
+      color: #174ea6;
+      background: rgba(36, 107, 254, 0.10);
+      border: 1px solid rgba(36, 107, 254, 0.24);
+      border-radius: 8px;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .install-strip.visible {
+      display: flex;
+    }
+
+    .habit-list {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .habit-item {
+      display: grid;
+      grid-template-columns: 16px minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      min-height: 42px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .habit-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 700;
+    }
+
+    .delete-btn {
+      border: 0;
+      background: transparent;
+      color: #9a2f43;
+      cursor: pointer;
+      font-size: 18px;
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
+    }
+
+    .delete-btn:hover {
+      background: rgba(154, 47, 67, 0.10);
+    }
+
+    .add-habit {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 54px auto;
+      gap: 8px;
+      align-items: end;
+    }
+
+    input[type="color"] {
+      width: 54px;
+      padding: 4px;
+      cursor: pointer;
+    }
+
+    .empty {
+      padding: 24px;
+      color: var(--muted);
+      text-align: center;
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.48);
+    }
+
+    @media (max-width: 900px) {
+      .topbar,
+      .heatmap-head {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .controls,
+      .grid-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .month-actions {
+        align-items: center;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .shell {
+        width: min(100% - 20px, 1180px);
+        padding-top: 16px;
+      }
+
+      .controls,
+      .heatmap-panel,
+      .card {
+        padding: 12px;
+      }
+
+      .weekdays,
+      .days {
+        gap: 5px;
+      }
+
+      .weekday {
+        font-size: 12px;
+      }
+
+      .day {
+        min-height: 50px;
+        padding: 6px;
+      }
+
+      .date {
+        font-size: 13px;
+      }
+
+      .count {
+        font-size: 11px;
+        padding: 2px 5px;
+      }
+
+      .add-habit {
+        grid-template-columns: 1fr 54px;
+      }
+
+      .add-habit .primary-btn {
+        grid-column: 1 / -1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div>
+        <h1>月度习惯热力图</h1>
+        <p class="subtitle">记录每一天的咖啡、健身、跳舞次数。颜色越深，代表这个月里那一天做得越多。</p>
+      </div>
+    </header>
+
+    <section class="install-strip" id="installStrip">
+      <span id="installText">可以安装到手机桌面，之后像 App 一样打开。</span>
+      <button class="primary-btn" id="installBtn">安装</button>
+    </section>
+
+    <section class="controls panel" aria-label="筛选和录入">
+      <div class="field">
+        <label for="habitSelect">项目</label>
+        <select id="habitSelect"></select>
+      </div>
+      <div class="field">
+        <label for="monthPicker">月份</label>
+        <div class="month-actions">
+          <button class="icon-btn" id="prevMonth" title="上个月" aria-label="上个月">‹</button>
+          <input id="monthPicker" type="month" />
+          <button class="icon-btn" id="nextMonth" title="下个月" aria-label="下个月">›</button>
+          <button class="ghost-btn" id="todayBtn">回到本月</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>&nbsp;</label>
+        <button class="ghost-btn" id="exportBtn">导出数据</button>
+      </div>
+    </section>
+
+    <section class="grid-layout">
+      <section class="heatmap-panel panel" aria-label="热力图">
+        <div class="heatmap-head">
+          <div class="heatmap-title">
+            <span class="habit-dot" id="titleDot"></span>
+            <h2 id="heatmapTitle">热力图</h2>
+          </div>
+          <div class="stats">
+            <span class="stat-pill" id="totalStat">总计 0 次</span>
+            <span class="stat-pill" id="bestStat">最高 0 次</span>
+            <span class="stat-pill" id="activeStat">记录 0 天</span>
+          </div>
+        </div>
+        <div class="weekdays" id="weekdays"></div>
+        <div class="days" id="days"></div>
+        <div class="legend" id="legend"></div>
+      </section>
+
+      <aside class="side">
+        <section class="card panel" aria-label="当天记录">
+          <h3>当天次数</h3>
+          <div class="entry-summary">
+            <div>
+              <div class="selected-date" id="selectedDate">1日</div>
+              <div class="entry-count" id="entryLabel">当前 0 次</div>
+            </div>
+          </div>
+          <div class="stepper">
+            <button class="icon-btn" id="minusBtn" title="减少" aria-label="减少">−</button>
+            <input id="countInput" type="number" min="0" step="1" value="0" />
+            <button class="icon-btn" id="plusBtn" title="增加" aria-label="增加">+</button>
+          </div>
+          <div class="entry-actions">
+            <button class="primary-btn" id="saveBtn">保存</button>
+            <button class="ghost-btn" id="clearBtn">清零</button>
+          </div>
+        </section>
+
+        <section class="card panel" aria-label="项目管理">
+          <h3>项目管理</h3>
+          <div class="habit-list" id="habitList"></div>
+          <div class="add-habit">
+            <input id="newHabitName" placeholder="新增项目，比如 阅读" />
+            <input id="newHabitColor" type="color" value="#246bfe" title="颜色" aria-label="颜色" />
+            <button class="primary-btn" id="addHabitBtn">添加</button>
+          </div>
+        </section>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const STORAGE_KEY = "monthly-heatmap-tracker-v1";
+    const weekdays = ["一", "二", "三", "四", "五", "六", "日"];
+    const defaultState = {
+      habits: [
+        { id: "coffee", name: "喝咖啡", color: "#8b5e34" },
+        { id: "fitness", name: "健身", color: "#1e8a6a" },
+        { id: "dance", name: "跳舞", color: "#b84a62" }
+      ],
+      entries: {},
+      selectedHabitId: "coffee",
+      selectedMonth: currentMonthValue(),
+      selectedDay: 1
+    };
+
+    let state = loadState();
+
+    const els = {
+      habitSelect: document.querySelector("#habitSelect"),
+      monthPicker: document.querySelector("#monthPicker"),
+      prevMonth: document.querySelector("#prevMonth"),
+      nextMonth: document.querySelector("#nextMonth"),
+      todayBtn: document.querySelector("#todayBtn"),
+      exportBtn: document.querySelector("#exportBtn"),
+      installStrip: document.querySelector("#installStrip"),
+      installBtn: document.querySelector("#installBtn"),
+      installText: document.querySelector("#installText"),
+      titleDot: document.querySelector("#titleDot"),
+      heatmapTitle: document.querySelector("#heatmapTitle"),
+      totalStat: document.querySelector("#totalStat"),
+      bestStat: document.querySelector("#bestStat"),
+      activeStat: document.querySelector("#activeStat"),
+      weekdays: document.querySelector("#weekdays"),
+      days: document.querySelector("#days"),
+      legend: document.querySelector("#legend"),
+      selectedDate: document.querySelector("#selectedDate"),
+      entryLabel: document.querySelector("#entryLabel"),
+      countInput: document.querySelector("#countInput"),
+      minusBtn: document.querySelector("#minusBtn"),
+      plusBtn: document.querySelector("#plusBtn"),
+      saveBtn: document.querySelector("#saveBtn"),
+      clearBtn: document.querySelector("#clearBtn"),
+      habitList: document.querySelector("#habitList"),
+      newHabitName: document.querySelector("#newHabitName"),
+      newHabitColor: document.querySelector("#newHabitColor"),
+      addHabitBtn: document.querySelector("#addHabitBtn")
+    };
+
+    function currentMonthValue() {
+      const now = new Date();
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    }
+
+    function loadState() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if (!saved || !Array.isArray(saved.habits) || !saved.habits.length) return structuredClone(defaultState);
+        return { ...structuredClone(defaultState), ...saved };
+      } catch {
+        return structuredClone(defaultState);
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function activeHabit() {
+      return state.habits.find((habit) => habit.id === state.selectedHabitId) || state.habits[0];
+    }
+
+    function entryKey(day = state.selectedDay) {
+      return `${state.selectedHabitId}:${state.selectedMonth}:${day}`;
+    }
+
+    function getCount(day = state.selectedDay) {
+      return Number(state.entries[entryKey(day)] || 0);
+    }
+
+    function setCount(day, count) {
+      const cleanCount = Math.max(0, Math.floor(Number(count) || 0));
+      const key = entryKey(day);
+      if (cleanCount === 0) {
+        delete state.entries[key];
+      } else {
+        state.entries[key] = cleanCount;
+      }
+      saveState();
+    }
+
+    function monthParts(monthValue) {
+      const [year, month] = monthValue.split("-").map(Number);
+      return { year, month };
+    }
+
+    function daysInMonth(monthValue) {
+      const { year, month } = monthParts(monthValue);
+      return new Date(year, month, 0).getDate();
+    }
+
+    function firstWeekdayOffset(monthValue) {
+      const { year, month } = monthParts(monthValue);
+      const day = new Date(year, month - 1, 1).getDay();
+      return day === 0 ? 6 : day - 1;
+    }
+
+    function shiftMonth(offset) {
+      const { year, month } = monthParts(state.selectedMonth);
+      const date = new Date(year, month - 1 + offset, 1);
+      state.selectedMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+      state.selectedDay = Math.min(state.selectedDay, daysInMonth(state.selectedMonth));
+      saveState();
+      render();
+    }
+
+    function hexToRgb(hex) {
+      const clean = hex.replace("#", "");
+      return {
+        r: parseInt(clean.slice(0, 2), 16),
+        g: parseInt(clean.slice(2, 4), 16),
+        b: parseInt(clean.slice(4, 6), 16)
+      };
+    }
+
+    function mixColor(hex, strength) {
+      const rgb = hexToRgb(hex);
+      const base = { r: 255, g: 255, b: 255 };
+      const amount = Math.min(0.94, Math.max(0.08, strength));
+      const r = Math.round(base.r + (rgb.r - base.r) * amount);
+      const g = Math.round(base.g + (rgb.g - base.g) * amount);
+      const b = Math.round(base.b + (rgb.b - base.b) * amount);
+      return `rgb(${r}, ${g}, ${b})`;
+    }
+
+    function textColorFor(hex, strength) {
+      if (strength < 0.58) return "#202124";
+      const { r, g, b } = hexToRgb(hex);
+      const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      return luminance < 0.62 ? "#ffffff" : "#202124";
+    }
+
+    function monthCounts() {
+      const totalDays = daysInMonth(state.selectedMonth);
+      return Array.from({ length: totalDays }, (_, index) => getCount(index + 1));
+    }
+
+    function renderHabitOptions() {
+      els.habitSelect.innerHTML = "";
+      state.habits.forEach((habit) => {
+        const option = document.createElement("option");
+        option.value = habit.id;
+        option.textContent = habit.name;
+        els.habitSelect.appendChild(option);
+      });
+      els.habitSelect.value = state.selectedHabitId;
+    }
+
+    function renderWeekdays() {
+      els.weekdays.innerHTML = weekdays.map((day) => `<div class="weekday">${day}</div>`).join("");
+    }
+
+    function renderHeatmap() {
+      const habit = activeHabit();
+      const counts = monthCounts();
+      const maxCount = Math.max(1, ...counts);
+      const total = counts.reduce((sum, value) => sum + value, 0);
+      const activeDays = counts.filter(Boolean).length;
+      const best = Math.max(0, ...counts);
+      const offset = firstWeekdayOffset(state.selectedMonth);
+
+      document.documentElement.style.setProperty("--habit-color", habit.color);
+      els.titleDot.style.background = habit.color;
+      els.heatmapTitle.textContent = `${habit.name} · ${state.selectedMonth}`;
+      els.totalStat.textContent = `总计 ${total} 次`;
+      els.bestStat.textContent = `最高 ${best} 次`;
+      els.activeStat.textContent = `记录 ${activeDays} 天`;
+
+      els.days.innerHTML = "";
+      for (let i = 0; i < offset; i += 1) {
+        const blank = document.createElement("div");
+        blank.className = "day blank";
+        els.days.appendChild(blank);
+      }
+
+      counts.forEach((count, index) => {
+        const dayNumber = index + 1;
+        const strength = count === 0 ? 0.04 : 0.18 + (count / maxCount) * 0.76;
+        const day = document.createElement("button");
+        day.type = "button";
+        day.className = `day${dayNumber === state.selectedDay ? " selected" : ""}`;
+        day.style.setProperty("--heat-color", count === 0 ? "#ffffff" : mixColor(habit.color, strength));
+        day.style.setProperty("--day-text", textColorFor(habit.color, strength));
+        day.innerHTML = `<span class="date">${dayNumber}</span><span class="count">${count} 次</span>`;
+        day.addEventListener("click", () => {
+          state.selectedDay = dayNumber;
+          saveState();
+          render();
+        });
+        els.days.appendChild(day);
+      });
+
+      const levels = [0, 0.24, 0.46, 0.68, 0.9];
+      els.legend.innerHTML = `<span>少</span>${levels.map((level) => {
+        const color = level === 0 ? "#ffffff" : mixColor(habit.color, level);
+        return `<span class="legend-swatch" style="background:${color}"></span>`;
+      }).join("")}<span>多</span>`;
+    }
+
+    function renderEntryPanel() {
+      const count = getCount();
+      els.selectedDate.textContent = `${state.selectedDay}日`;
+      els.entryLabel.textContent = `当前 ${count} 次`;
+      els.countInput.value = count;
+    }
+
+    function renderHabitList() {
+      els.habitList.innerHTML = "";
+      state.habits.forEach((habit) => {
+        const item = document.createElement("div");
+        item.className = "habit-item";
+        item.innerHTML = `
+          <span class="habit-dot" style="background:${habit.color}"></span>
+          <span class="habit-name">${habit.name}</span>
+          <button class="delete-btn" title="删除 ${habit.name}" aria-label="删除 ${habit.name}">×</button>
+        `;
+        item.querySelector("button").addEventListener("click", () => deleteHabit(habit.id));
+        els.habitList.appendChild(item);
+      });
+    }
+
+    function render() {
+      if (!activeHabit()) {
+        state.selectedHabitId = defaultState.habits[0].id;
+        state.habits = structuredClone(defaultState.habits);
+      }
+      state.selectedDay = Math.min(state.selectedDay, daysInMonth(state.selectedMonth));
+      els.monthPicker.value = state.selectedMonth;
+      renderHabitOptions();
+      renderWeekdays();
+      renderHeatmap();
+      renderEntryPanel();
+      renderHabitList();
+    }
+
+    function deleteHabit(habitId) {
+      if (state.habits.length <= 1) {
+        alert("至少保留一个项目。");
+        return;
+      }
+      const habit = state.habits.find((item) => item.id === habitId);
+      if (!confirm(`删除「${habit.name}」及它的记录？`)) return;
+      state.habits = state.habits.filter((item) => item.id !== habitId);
+      Object.keys(state.entries).forEach((key) => {
+        if (key.startsWith(`${habitId}:`)) delete state.entries[key];
+      });
+      if (state.selectedHabitId === habitId) {
+        state.selectedHabitId = state.habits[0].id;
+      }
+      saveState();
+      render();
+    }
+
+    function addHabit() {
+      const name = els.newHabitName.value.trim();
+      if (!name) return;
+      const id = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      state.habits.push({ id, name, color: els.newHabitColor.value });
+      state.selectedHabitId = id;
+      els.newHabitName.value = "";
+      saveState();
+      render();
+    }
+
+    function exportData() {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `habit-heatmap-${state.selectedMonth}.json`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    els.habitSelect.addEventListener("change", () => {
+      state.selectedHabitId = els.habitSelect.value;
+      saveState();
+      render();
+    });
+
+    els.monthPicker.addEventListener("change", () => {
+      state.selectedMonth = els.monthPicker.value || currentMonthValue();
+      state.selectedDay = Math.min(state.selectedDay, daysInMonth(state.selectedMonth));
+      saveState();
+      render();
+    });
+
+    els.prevMonth.addEventListener("click", () => shiftMonth(-1));
+    els.nextMonth.addEventListener("click", () => shiftMonth(1));
+    els.todayBtn.addEventListener("click", () => {
+      state.selectedMonth = currentMonthValue();
+      state.selectedDay = new Date().getDate();
+      saveState();
+      render();
+    });
+
+    els.minusBtn.addEventListener("click", () => {
+      els.countInput.value = Math.max(0, Number(els.countInput.value || 0) - 1);
+    });
+
+    els.plusBtn.addEventListener("click", () => {
+      els.countInput.value = Number(els.countInput.value || 0) + 1;
+    });
+
+    els.saveBtn.addEventListener("click", () => {
+      setCount(state.selectedDay, els.countInput.value);
+      render();
+    });
+
+    els.clearBtn.addEventListener("click", () => {
+      setCount(state.selectedDay, 0);
+      render();
+    });
+
+    els.countInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        setCount(state.selectedDay, els.countInput.value);
+        render();
+      }
+    });
+
+    els.addHabitBtn.addEventListener("click", addHabit);
+    els.newHabitName.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") addHabit();
+    });
+    els.exportBtn.addEventListener("click", exportData);
+
+    let deferredInstallPrompt = null;
+    const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
+
+    window.addEventListener("beforeinstallprompt", (event) => {
+      event.preventDefault();
+      deferredInstallPrompt = event;
+      if (!isStandalone) {
+        els.installStrip.classList.add("visible");
+      }
+    });
+
+    els.installBtn.addEventListener("click", async () => {
+      if (!deferredInstallPrompt) {
+        els.installText.textContent = "在手机浏览器菜单里选择“添加到主屏幕”。";
+        els.installBtn.style.display = "none";
+        els.installStrip.classList.add("visible");
+        return;
+      }
+      deferredInstallPrompt.prompt();
+      await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      els.installStrip.classList.remove("visible");
+    });
+
+    if ("serviceWorker" in navigator && location.protocol !== "file:") {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js");
+      });
+    }
+
+    render();
+  </script>
+</body>
+</html>
